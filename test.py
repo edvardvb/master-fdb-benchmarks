@@ -1,7 +1,9 @@
 import argparse
-import timeit
+
 from constants import DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO, STRICT_MONGO
 from utils import get_client
+from workloads.workload_a import Workload_A
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-runner', required=True, choices=[DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO, STRICT_MONGO])
@@ -11,25 +13,10 @@ args = parser.parse_args()
 db = get_client(args.runner)['fdb-benchmark']
 collection = db[args.runner]
 
+workload = Workload_A(collection)
 
-def perform_test():
-    for i in range(100):
-        collection.insert_one(
-            {
-                "item" : "canvas" + str(i),
-                "qty" : 100 + i,
-                "tags" : ["cotton"],
-                "title" : "How do I create manual workload i.e., Bulk inserts to Collection ",
-                " Iteration no:" : i
-            }
-        )
-    collection.drop()
+total_runtime, avg_runtime, throughput = workload.benchmark(args.num_runs)
 
-t = timeit.timeit(perform_test, number=args.num_runs)
-
-print(t/args.num_runs)
-
-
-
-
-
+print(f'⏱  Total runtime: {total_runtime}')
+print(f'🧮  Average runtime: {avg_runtime}')
+print(f'🏎  Throughput: {throughput}')
