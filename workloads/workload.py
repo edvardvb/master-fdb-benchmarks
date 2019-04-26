@@ -1,25 +1,27 @@
 import timeit
 from abc import ABC, abstractmethod
 
-from utils import generate_data
+from utils import generate_data, timeit_patch
 
+timeit.template = timeit_patch
 
 class Workload(ABC):
-    records = 0
-    operations = 0
 
-    def __init__(self, collection):
-        generate_data(self.records, collection)
+    def __init__(self, collection, records, operations):
         self.collection = collection
+        self.records = records
+        self.operations = operations
+        generate_data(self.records, self.collection)
 
     @abstractmethod
     def perform_workload(self):
         pass
 
-    def benchmark(self, num_runs):
-        total_runtime = timeit.timeit(self.perform_workload, number=num_runs)
-        avg_runtime = total_runtime/num_runs
-        throughput = self.operations/avg_runtime
+    def benchmark(self):
+        runtime, output = timeit.timeit(self.perform_workload, number=1)
+
+        throughput = self.operations/runtime
         self.collection.drop()
-        return total_runtime, avg_runtime, throughput
+
+        return runtime, throughput, output
 

@@ -11,8 +11,11 @@ class Workload_A(Workload):
       100000 operations
       :return:
     """
-    records = 1000
-    operations = 100000
+
+    def __init__(self, collection):
+        records = 1000
+        operations = 100000
+        super().__init__(collection, records, operations)
 
     def perform_workload(self):
         num_read = 0
@@ -30,7 +33,10 @@ class Workload_A(Workload):
                         'title': f"Updated at operation {i}"
                     }
                      })
-        print('📖 Number of reads: ', num_read)
-        print('✍️  Number of updates: ', num_update)
-        print((num_read/self.operations)*100, " % reads")
+        return (
+            f'📖 Number of reads: {num_read}\n' +
+            f'✍️  Number of updates: {num_update}\n' +
+            f'{(num_read/self.operations)*100}% reads'
+        )
+
 

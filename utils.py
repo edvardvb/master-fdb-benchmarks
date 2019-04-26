@@ -1,18 +1,3 @@
-from pymongo import MongoClient
-
-from constants import DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO, STRICT_MONGO
-
-
-def get_client(runner):
-    if runner == DOCUMENT_LAYER:
-        client = MongoClient('mongodb://localhost:27016/')
-    elif runner == STRICT_MONGO:
-        client = MongoClient('mongodb://localhost:27017/fdb-benchmark?w=majority&journal=true')
-    else:
-        client = MongoClient()
-
-    return client
-
 def generate_data(number_of_records, collection):
     new_docs = []
     for i in range(number_of_records):
@@ -27,3 +12,13 @@ def generate_data(number_of_records, collection):
     collection.insert_many(new_docs)
     print('Dataset generated')
     print(f'{number_of_records} records inserted')
+
+timeit_patch = """
+def inner(_it, _timer{init}):
+    {setup}
+    _t0 = _timer()
+    for _i in _it:
+        retval = {stmt}
+    _t1 = _timer()
+    return _t1 - _t0, retval
+"""
