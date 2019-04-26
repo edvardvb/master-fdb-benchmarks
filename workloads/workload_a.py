@@ -12,12 +12,15 @@ class Workload_A(Workload):
       :return:
     """
 
-    def __init__(self, collection):
+    def __init__(self, collection, runners):
         records = 1000
         operations = 100000
-        super().__init__(collection, records, operations)
+        super().__init__(collection, runners, records, operations)
 
-    def perform_workload(self):
+    def run_benchmark(self):
+        return getattr(self, f'benchmark_{self.runner}')()
+
+    def benchmark_mongo3(self):
         num_read = 0
         num_update = 0
         for i in range (self.operations):
@@ -39,4 +42,8 @@ class Workload_A(Workload):
             f'{(num_read/self.operations)*100}% reads'
         )
 
+    def benchmark_mongo4(self):
+        pass
 
+    def benchmark_fdbdl(self):
+        pass

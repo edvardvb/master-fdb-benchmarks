@@ -12,7 +12,7 @@ args = parser.parse_args()
 db = get_client(args.runner)['fdb-benchmark']
 collection = db[args.runner]
 
-workload = get_workload(args.workload, collection)
+workload = get_workload(args.workload, collection, args.runner)
 
 runtime, throughput, output = workload.benchmark()
 print(output)

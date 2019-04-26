@@ -14,6 +14,6 @@ def get_client(runner):
 
     return client
 
-def get_workload(workload, collection):
+def get_workload(workload, collection, runner):
     if workload == 'a':
-        return Workload_A(collection)
+        return Workload_A(collection, runner)
