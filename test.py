@@ -1,32 +1,20 @@
 import argparse
 import timeit
-from pymongo import MongoClient
-
-
-DOCUMENT_LAYER = 'fdbdl'
-STANDARD_MONGO = 'mongo3'
-TRANSACTIONAL_MONGO = 'mongo4'
-STRICT_MONGO = 'mongowc'
+from constants import DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO, STRICT_MONGO
+from utils import get_client
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-runner', choices=[DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO, STRICT_MONGO])
+parser.add_argument('-runner', required=True, choices=[DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO, STRICT_MONGO])
+parser.add_argument('-num_runs', required=True, type=int)
 args = parser.parse_args()
 
-if args.runner:
-    runner = args.runner
-else: runner = DOCUMENT_LAYER
+db = get_client(args.runner)['fdb-benchmark']
+collection = db[args.runner]
 
-if runner == DOCUMENT_LAYER:
-    client = MongoClient('mongodb://localhost:27016/')
-else:
-    client = MongoClient()
-
-db = client['fdb-benchmark']
-collection = db[runner]
 
 def perform_test():
     for i in range(100):
-        collection.insert(
+        collection.insert_one(
             {
                 "item" : "canvas" + str(i),
                 "qty" : 100 + i,
@@ -35,10 +23,13 @@ def perform_test():
                 " Iteration no:" : i
             }
         )
+    collection.drop()
 
-t = timeit.timeit(perform_test, number=1)
+t = timeit.timeit(perform_test, number=args.num_runs)
 
-print(t)
+print(t/args.num_runs)
 
-collection.drop()
+
+
+
 
