@@ -14,6 +14,7 @@ class Workload(ABC):
         self.records = records
         self.operations = operations
         generate_data(self.records, self.collection)
+        print(f'Performing {operations} operations, using runner {runner}')
 
     def benchmark(self):
         runtime, output = timeit.timeit(getattr(self, f'benchmark_{self.runner}'), number=1)

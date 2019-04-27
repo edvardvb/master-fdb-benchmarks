@@ -10,6 +10,8 @@ def get_client(runner):
         client = MongoClient('mongodb://localhost:27016/')
     elif runner == STRICT_MONGO:
         client = MongoClient('mongodb://localhost:27017/fdb-benchmark?w=majority&journal=true')
+    elif runner == TRANSACTIONAL_MONGO:
+        client = MongoClient('mongodb://localhost:27017/fdb-benchmark?replicaSet=rs')
     else:
         client = MongoClient()
 

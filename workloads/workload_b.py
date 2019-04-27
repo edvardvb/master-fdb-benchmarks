@@ -23,23 +23,19 @@ class Workload_B(Workload):
         super().__init__(db, runners, records, operations)
 
     def benchmark_mongo3(self):
-        for i in range(int(self.operations/10)):
-            ops = []
-            for i in range(10):
-                op = random.choices([READ, UPDATE], [50, 50])[0]
-                ops.append(op)
-            for op in ops:
-                if op == READ:
-                    self.num_read += 1
-                    self.collection.find_one({'_id': i // 100})
-                elif op == UPDATE:
-                    self.num_update += 1
-                    self.collection.update_one(
-                        {'_id': i // 100},
-                        {'$set': {
-                            'title': f"Updated at operation {i}"
-                        }
-                        })
+        ops = random.choices([READ, UPDATE], [50, 50], k=self.operations)
+        for i, op in enumerate(ops):
+            if op == READ:
+                self.num_read += 1
+                self.collection.find_one({'_id': i // 100})
+            elif op == UPDATE:
+                self.num_update += 1
+                self.collection.update_one(
+                    {'_id': i // 100},
+                    {'$set': {
+                        'title': f"Updated at operation {i}"
+                    }
+                    })
         return (
                 f'📖 Number of reads: {self.num_read}\n' +
                 f'✍️  Number of updates: {self.num_update}\n' +
@@ -49,13 +45,12 @@ class Workload_B(Workload):
     def benchmark_mongo4(self):
         rc = read_concern.ReadConcern('majority')
         wc = write_concern.WriteConcern('majority')
+        batch_size = 5000
+        print(f'Batch size: {batch_size}')
 
         with self.collection.database.client.start_session() as session:
-            for i in range(int(self.operations/10)):
-                ops = []
-                for i in range(10):
-                    op = random.choices([READ, UPDATE], [50, 50])[0]
-                    ops.append(op)
+            for i in range(int(self.operations/batch_size)):
+                ops = random.choices([READ, UPDATE], [50, 50], k=batch_size)
                 with session.start_transaction(read_concern=rc, write_concern=wc):
                     for op in ops:
                         if op == READ:
@@ -91,11 +86,10 @@ class Workload_B(Workload):
                     })
 
     def benchmark_fdbdl(self):
-        for i in range(int(self.operations / 10)):
-            ops = []
-            for i in range(10):
-                op = random.choices([READ, UPDATE], [50, 50])[0]
-                ops.append(op)
+        batch_size = 5000
+        print(f'Batch size: {batch_size}')
+        for i in range(int(self.operations / batch_size)):
+            ops = random.choices([READ, UPDATE], [50, 50], k=batch_size)
             self.perform_operations(self.db, ops, i)
         return (
                 f'📖 Number of reads: {self.num_read}\n' +
