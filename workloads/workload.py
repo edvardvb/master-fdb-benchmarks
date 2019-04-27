@@ -7,19 +7,16 @@ timeit.template = timeit_patch
 
 class Workload(ABC):
 
-    def __init__(self, collection, runner, records, operations):
-        self.collection = collection
+    def __init__(self, db, runner, records, operations):
+        self.db = db
+        self.collection = db[runner]
         self.runner = runner
         self.records = records
         self.operations = operations
         generate_data(self.records, self.collection)
 
-    @abstractmethod
-    def run_benchmark(self):
-        pass
-
     def benchmark(self):
-        runtime, output = timeit.timeit(self.run_benchmark, number=1)
+        runtime, output = timeit.timeit(getattr(self, f'benchmark_{self.runner}'), number=1)
 
         throughput = self.operations/runtime
         self.collection.drop()
