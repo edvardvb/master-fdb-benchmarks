@@ -35,6 +35,3 @@ class Workload(ABC):
     @abstractmethod
     def benchmark_fdbdl(self):
         pass
-
-    def benchmark_mongowc(self):
-        return self.benchmark_mongo3()

@@ -9,7 +9,7 @@ from utils import transactional
 
 class Workload_A(Workload):
     """
-      95/5 read/update
+      50/50 read/update
       1000 records
       100000 operations
       :return:
@@ -23,7 +23,7 @@ class Workload_A(Workload):
         super().__init__(db, runners, records, operations)
 
     def benchmark_mongo3(self):
-        ops = random.choices([READ, UPDATE], [95, 5], k=self.operations)
+        ops = random.choices([READ, UPDATE], [50, 50], k=self.operations)
         for i, op in enumerate(ops):
             if op == READ:
                 self.num_read += 1
@@ -50,7 +50,7 @@ class Workload_A(Workload):
 
         with self.collection.database.client.start_session() as session:
             for i in range(int(self.operations/batch_size)):
-                ops = random.choices([READ, UPDATE], [95, 5], k=batch_size)
+                ops = random.choices([READ, UPDATE], [50, 50], k=batch_size)
                 with session.start_transaction(read_concern=rc, write_concern=wc):
                     for op in ops:
                         if op == READ:
@@ -87,9 +87,9 @@ class Workload_A(Workload):
 
     def benchmark_fdbdl(self):
         batch_size = 5000
-        print(batch_size)
+        print(f'Batch size: {batch_size}')
         for i in range(int(self.operations / batch_size)):
-            ops = random.choices([READ, UPDATE], [95, 5], k=batch_size)
+            ops = random.choices([READ, UPDATE], [50, 50], k=batch_size)
             self.perform_operations(self.db, ops, i)
         return (
                 f'📖 Number of reads: {self.num_read}\n' +
