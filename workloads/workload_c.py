@@ -20,6 +20,9 @@ class Workload_C(Workload):
         self.num_read = 0
         super().__init__(db, runners, records, operations)
 
+    def __repr__(self):
+        return 'workload C'
+
     def benchmark_mongo3(self):
         for i in range(self.operations):
             self.num_read += 1
@@ -39,9 +42,9 @@ class Workload_C(Workload):
         with self.collection.database.client.start_session() as session:
             for i in range(int(self.operations / batch_size)):
                 with session.start_transaction(read_concern=rc, write_concern=wc):
-                    for i in range(batch_size):
+                    for j in range(batch_size):
                         self.num_read += 1
-                        self.collection.find_one({'_id': i // 100}, session=session)
+                        self.collection.find_one({'_id': i*j // 100}, session=session)
 
             return (
                     f'📖 Number of reads: {self.num_read}\n' +
@@ -50,9 +53,9 @@ class Workload_C(Workload):
 
     @transactional
     def perform_operations(self, db, batch_size, i):
-        for i in range(batch_size):
+        for j in range(batch_size):
             self.num_read += 1
-            self.collection.find_one({'_id': i // 100})
+            self.collection.find_one({'_id': i*j // 100})
 
 
     def benchmark_fdbdl(self):

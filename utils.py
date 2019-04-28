@@ -10,8 +10,8 @@ def generate_data(number_of_records, collection):
             }
         )
     collection.insert_many(new_docs)
-    print('Dataset generated')
-    print(f'{number_of_records} records inserted')
+    print('👷‍♂️ Dataset generated')
+    print(f'🚚 {number_of_records} records inserted')
 
 timeit_patch = """
 def inner(_it, _timer{init}):

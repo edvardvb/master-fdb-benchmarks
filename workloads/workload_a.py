@@ -22,6 +22,9 @@ class Workload_A(Workload):
         self.num_update = 0
         super().__init__(db, runners, records, operations)
 
+    def __repr__(self):
+        return 'workload A'
+
     def benchmark_mongo3(self):
         ops = random.choices([READ, UPDATE], [50, 50], k=self.operations)
         for i, op in enumerate(ops):
