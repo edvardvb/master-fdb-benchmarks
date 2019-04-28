@@ -4,6 +4,7 @@ from constants import DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO
 from workloads.workload_a import Workload_A
 from workloads.workload_b import Workload_B
 from workloads.workload_c import Workload_C
+from workloads.workload_d import Workload_D
 
 
 def get_client(runner):
@@ -23,6 +24,8 @@ def get_workload(workload, db, runner):
         return Workload_B(db, runner)
     if workload == 'c':
         return Workload_C(db, runner)
+    if workload == 'd':
+        return Workload_D(db, runner)
 
 def get_database(runner):
     client = get_client(runner)

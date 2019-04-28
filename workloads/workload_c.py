@@ -1,8 +1,6 @@
-import random
 from pymongo import write_concern, read_concern
 
 from workloads.workload import Workload
-from constants import READ, UPDATE
 from utils import transactional
 
 

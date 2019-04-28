@@ -13,8 +13,13 @@ Benchmarking tool for comparing MongoDB and FoundationDB Document Layer, written
 
 #### Usage
 - Ensure FDB and FDB-DL is running
-- `mongod`
+- Start mongo daemon: `mongod -replSet rs`
+- If not done before, initiate replica set in mongo client: 
+  - `mongo`
+  - `rs.initiate()` 
 - `source venv/bin/activate`
-- `python test.py -runner mongo3 -workload a`
-- Replace `mongo3` with either `fdbdl`,`mongo4`, or `mongowc` as necessary.
-- Replace `a` with the corresponding letter for other workloads as necessary.
+- `python test.py -runners <runner 1> <runner 2> ... -workloads <workload 1> <workload 2> ...`
+  - Insert the runners you wish to benchmark. The tool can benchmark several runners at once
+    - `mongo3`, `mongo4`, or `fdbdl`
+  - Insert the workloads you wish to use. The tool can benchmark several workloads at once
+    - `a`, `b`, `c`, `d`, `e` or `f`

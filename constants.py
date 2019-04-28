@@ -4,3 +4,4 @@ TRANSACTIONAL_MONGO = 'mongo4'
 
 READ = 'read'
 UPDATE = 'update'
+INSERT = 'insert'
