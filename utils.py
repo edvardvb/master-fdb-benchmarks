@@ -14,17 +14,6 @@ def generate_data(number_of_records, collection):
     print(f"🚚 {number_of_records} records inserted")
 
 
-timeit_patch = """
-def inner(_it, _timer{init}):
-    {setup}
-    _t0 = _timer()
-    for _i in _it:
-        retval = {stmt}
-    _t1 = _timer()
-    return _t1 - _t0, retval
-"""
-
-
 def transactional(func):
     index = inspect.getargspec(func).args.index("db")
 

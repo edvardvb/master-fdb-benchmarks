@@ -10,13 +10,13 @@ class Workload_B(Workload):
     """
       95/5 read/update
       1000 records
-      100000 operations
+      10000 operations
       :return:
     """
 
     def __init__(self, db, runners):
         records = 1000
-        operations = 100000
+        operations = 10000
 
         super().__init__(db, runners, records, operations)
 

@@ -16,7 +16,7 @@ class Workload_E(Workload):
 
     def __init__(self, db, runners):
         records = 1000
-        operations = 100000
+        operations = 10000
 
         super().__init__(db, runners, records, operations)
 
@@ -29,7 +29,7 @@ class Workload_E(Workload):
             if op == READ:
                 self.num_read += 1
                 scan_length = random.randint(0, 10)
-                self.total_scan_length += scan_length
+                self.run_scan_length += scan_length
                 list(self.collection.find({"item": {"$in": list(range(scan_length))}}))
             elif op == INSERT:
                 self.num_insert += 1
@@ -45,7 +45,7 @@ class Workload_E(Workload):
             f"📖 Number of reads: {self.num_read}\n"
             + f"✍️  Number of inserts: {self.num_insert}\n"
             + f"🔎 {(self.num_read / self.operations) * 100}% reads\n"
-            + f"Average scan length: {self.total_scan_length/self.num_read}"
+            + f"Average scan length: {self.run_scan_length/self.num_read}"
         )
 
     def benchmark_mongo4(self):
@@ -62,7 +62,7 @@ class Workload_E(Workload):
                         if op == READ:
                             self.num_read += 1
                             scan_length = random.randint(0, 10)
-                            self.total_scan_length += scan_length
+                            self.run_scan_length += scan_length
                             list(
                                 self.collection.find(
                                     {"item": {"$in": list(range(scan_length))}},
@@ -84,7 +84,7 @@ class Workload_E(Workload):
                 f"📖 Number of reads: {self.num_read}\n"
                 + f"✍️  Number of inserts: {self.num_insert}\n"
                 + f"🔎 {(self.num_read / self.operations) * 100}% reads\n"
-                + f"Average scan length: {self.total_scan_length / self.num_read}"
+                + f"Average scan length: {self.run_scan_length / self.num_read}"
             )
 
     @transactional
@@ -93,7 +93,7 @@ class Workload_E(Workload):
             if op == READ:
                 self.num_read += 1
                 scan_length = random.randint(0, 10)
-                self.total_scan_length += scan_length
+                self.run_scan_length += scan_length
                 list(self.collection.find({"item": {"$in": list(range(scan_length))}}))
             elif op == INSERT:
                 self.num_insert += 1
@@ -116,5 +116,5 @@ class Workload_E(Workload):
             f"📖 Number of reads: {self.num_read}\n"
             + f"✍️  Number of inserts: {self.num_insert}\n"
             + f"🔎 {(self.num_read / self.operations) * 100}% reads\n"
-            + f"Average scan length: {self.total_scan_length / self.num_read}"
+            + f"Average scan length: {self.run_scan_length / self.num_read}"
         )
