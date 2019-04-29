@@ -2,20 +2,17 @@ import random
 import inspect
 import pymongo as pm
 
+
 def generate_data(number_of_records, collection):
     new_docs = []
     for i in range(number_of_records):
         new_docs.append(
-            {
-                "item" : i,
-                "qty" : random.randint(1,11),
-                "tags" : ["tag"],
-                "title" : "title"
-            }
+            {"item": i, "qty": random.randint(1, 11), "tags": ["tag"], "title": "title"}
         )
     collection.insert_many(new_docs)
-    print('👷‍♂️ Dataset generated')
-    print(f'🚚 {number_of_records} records inserted')
+    print("👷‍♂️ Dataset generated")
+    print(f"🚚 {number_of_records} records inserted")
+
 
 timeit_patch = """
 def inner(_it, _timer{init}):
@@ -26,7 +23,6 @@ def inner(_it, _timer{init}):
     _t1 = _timer()
     return _t1 - _t0, retval
 """
-
 
 
 def transactional(func):
