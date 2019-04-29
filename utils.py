@@ -1,12 +1,16 @@
+import random
+import inspect
+import pymongo as pm
+
 def generate_data(number_of_records, collection):
     new_docs = []
     for i in range(number_of_records):
         new_docs.append(
             {
-                "item" : "canvas" + str(i),
-                "qty" : 100 + i,
-                "tags" : ["cotton"],
-                "title" : "How do I create manual workload i.e., Bulk inserts to Collection "
+                "item" : i,
+                "qty" : random.randint(1,11),
+                "tags" : ["tag"],
+                "title" : "title"
             }
         )
     collection.insert_many(new_docs)
@@ -23,8 +27,6 @@ def inner(_it, _timer{init}):
     return _t1 - _t0, retval
 """
 
-import inspect
-import pymongo as pm
 
 
 def transactional(func):

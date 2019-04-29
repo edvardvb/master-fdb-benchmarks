@@ -18,8 +18,7 @@ class Workload_A(Workload):
     def __init__(self, db, runners):
         records = 1000
         operations = 100000
-        self.num_read = 0
-        self.num_update = 0
+
         super().__init__(db, runners, records, operations)
 
     def __repr__(self):
@@ -30,11 +29,11 @@ class Workload_A(Workload):
         for i, op in enumerate(ops):
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({'_id': i // 100})
+                self.collection.find_one({'item': i // 100})
             elif op == UPDATE:
                 self.num_update += 1
                 self.collection.update_one(
-                    {'_id': i // 100},
+                    {'item': i // 100},
                     {'$set': {
                         'title': f"Updated at operation {i}"
                     }
@@ -42,7 +41,7 @@ class Workload_A(Workload):
         return (
                 f'📖 Number of reads: {self.num_read}\n' +
                 f'✍️  Number of updates: {self.num_update}\n' +
-                f'{(self.num_read / self.operations) * 100}% reads'
+                f'🔎 {(self.num_read / self.operations) * 100}% reads'
         )
 
     def benchmark_mongo4(self):
@@ -58,11 +57,11 @@ class Workload_A(Workload):
                     for op in ops:
                         if op == READ:
                             self.num_read += 1
-                            self.collection.find_one({'_id': i // 100}, session=session)
+                            self.collection.find_one({'item': i // 100}, session=session)
                         elif op == UPDATE:
                             self.num_update += 1
                             self.collection.update_one(
-                                {'_id': i // 100},
+                                {'item': i // 100},
                                 {'$set': {
                                     'title': f"Updated at operation {i}"
                                 }
@@ -70,7 +69,7 @@ class Workload_A(Workload):
             return (
                     f'📖 Number of reads: {self.num_read}\n' +
                     f'✍️  Number of updates: {self.num_update}\n' +
-                    f'{(self.num_read / self.operations) * 100}% reads'
+                    f'🔎 {(self.num_read / self.operations) * 100}% reads'
             )
         
     @transactional
@@ -97,6 +96,6 @@ class Workload_A(Workload):
         return (
                 f'📖 Number of reads: {self.num_read}\n' +
                 f'✍️  Number of updates: {self.num_update}\n' +
-                f'{(self.num_read / self.operations) * 100}% reads'
+                f'🔎 {(self.num_read / self.operations) * 100}% reads'
         )
 

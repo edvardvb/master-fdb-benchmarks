@@ -5,6 +5,7 @@ from workloads.workload_a import Workload_A
 from workloads.workload_b import Workload_B
 from workloads.workload_c import Workload_C
 from workloads.workload_d import Workload_D
+from workloads.workload_e import Workload_E
 
 
 def get_client(runner):
@@ -26,6 +27,8 @@ def get_workload(workload, db, runner):
         return Workload_C(db, runner)
     if workload == 'd':
         return Workload_D(db, runner)
+    if workload == 'e':
+        return Workload_E(db, runner)
 
 def get_database(runner):
     client = get_client(runner)

@@ -6,7 +6,7 @@ from setup import get_database, get_workload
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-runners', nargs='+', required=True, choices=[DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO])
-parser.add_argument('-workloads', nargs='+', required=True, choices=['a', 'b', 'c', 'd'])
+parser.add_argument('-workloads', nargs='+', required=True, choices=['a', 'b', 'c', 'd', 'e'])
 args = parser.parse_args()
 
 print(args.runners)

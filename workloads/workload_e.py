@@ -7,11 +7,11 @@ from utils import transactional
 
 
 
-class Workload_D(Workload):
+class Workload_E(Workload):
     """
-      95/5 read/insert
+      95/5 scanning_read/insert
       1000 records
-      100000 operations
+      10000 operations
       :return:
     """
 
@@ -22,15 +22,22 @@ class Workload_D(Workload):
         super().__init__(db, runners, records, operations)
 
     def __repr__(self):
-        return 'workload D'
+        return 'workload E'
+
+
 
     def benchmark_mongo3(self):
         ops = random.choices([READ, INSERT], [95, 5], k=self.operations)
         for i, op in enumerate(ops):
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({'item': i // 100})
-
+                scan_length = random.randint(0,10)
+                self.total_scan_length += scan_length
+                list(self.collection.find(
+                    {'item':
+                         {'$in': list(range(scan_length))}
+                     })
+                )
             elif op == INSERT:
                 self.num_insert += 1
                 self.collection.insert_one(
@@ -43,13 +50,14 @@ class Workload_D(Workload):
         return (
                 f'📖 Number of reads: {self.num_read}\n' +
                 f'✍️  Number of inserts: {self.num_insert}\n' +
-                f'🔎 {(self.num_read / self.operations) * 100}% reads'
+                f'🔎 {(self.num_read / self.operations) * 100}% reads\n' +
+                f'Average scan length: {self.total_scan_length/self.num_read}'
         )
 
     def benchmark_mongo4(self):
         rc = read_concern.ReadConcern('majority')
         wc = write_concern.WriteConcern('majority')
-        batch_size = 5000
+        batch_size = 1000
         print(f'Batch size: {batch_size}')
 
         with self.collection.database.client.start_session() as session:
@@ -59,7 +67,13 @@ class Workload_D(Workload):
                     for op in ops:
                         if op == READ:
                             self.num_read += 1
-                            self.collection.find_one({'item': i // 100}, session=session)
+                            scan_length = random.randint(0, 10)
+                            self.total_scan_length += scan_length
+                            list(self.collection.find(
+                                {'item':
+                                     {'$in': list(range(scan_length))}
+                                 }, session=session)
+                            )
                         elif op == INSERT:
                             self.num_insert += 1
                             self.collection.insert_one(
@@ -72,7 +86,8 @@ class Workload_D(Workload):
             return (
                     f'📖 Number of reads: {self.num_read}\n' +
                     f'✍️  Number of inserts: {self.num_insert}\n' +
-                    f'🔎 {(self.num_read / self.operations) * 100}% reads'
+                    f'🔎 {(self.num_read / self.operations) * 100}% reads\n' +
+                    f'Average scan length: {self.total_scan_length / self.num_read}'
             )
 
     @transactional
@@ -80,7 +95,13 @@ class Workload_D(Workload):
         for op in ops:
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({'item': i // 100})
+                scan_length = random.randint(0, 10)
+                self.total_scan_length += scan_length
+                list(self.collection.find(
+                    {'item':
+                         {'$in': list(range(scan_length))}
+                     })
+                )
             elif op == INSERT:
                 self.num_insert += 1
                 self.collection.insert_one(
@@ -92,7 +113,7 @@ class Workload_D(Workload):
                     })
 
     def benchmark_fdbdl(self):
-        batch_size = 5000
+        batch_size = 1000
         print(f'Batch size: {batch_size}')
         for i in range(int(self.operations / batch_size)):
             ops = random.choices([READ, INSERT], [95, 5], k=batch_size)
@@ -100,6 +121,7 @@ class Workload_D(Workload):
         return (
                 f'📖 Number of reads: {self.num_read}\n' +
                 f'✍️  Number of inserts: {self.num_insert}\n' +
-                f'🔎 {(self.num_read / self.operations) * 100}% reads'
+                f'🔎 {(self.num_read / self.operations) * 100}% reads\n' +
+                f'Average scan length: {self.total_scan_length / self.num_read}'
         )
 
