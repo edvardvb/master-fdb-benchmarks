@@ -1,8 +1,10 @@
 import time
 from abc import ABC, abstractmethod
+
 from pymongo import ASCENDING
 
 from utils import generate_data
+
 
 class Workload(ABC):
     def __init__(self, db, runner, records, operations):
@@ -18,7 +20,7 @@ class Workload(ABC):
         self.run_scan_length = 0
 
     def setup(self, run):
-        print(f'🔌 Setting up for run {run}')
+        print(f"🔌 Setting up for run {run}")
         self.num_read = 0
         self.num_update = 0
         self.num_insert = 0
@@ -43,7 +45,7 @@ class Workload(ABC):
         total_scan_length = 0
 
         for i in range(num_runs):
-            self.setup(i+1)
+            self.setup(i + 1)
             start = time.time()
             output = getattr(self, f"benchmark_{self.runner}")()
             end = time.time()
@@ -63,7 +65,9 @@ class Workload(ABC):
 
         avg_runtime = total_runtime / num_runs
 
-        print(f"== Summary for {num_runs} run{'s' if num_runs > 1 else ''} of {self.__repr__()} on runner {self.runner} ==")
+        print(
+            f"== Summary for {num_runs} run{'s' if num_runs > 1 else ''} of {self.__repr__()} on runner {self.runner} =="
+        )
         print(f"⏱  Average runtime: {avg_runtime}")
         print(f"🏎  Average throughput: {(self.operations)/avg_runtime}")
         print()

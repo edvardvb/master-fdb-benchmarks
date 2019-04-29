@@ -1,9 +1,10 @@
 import random
-from pymongo import write_concern, read_concern
 
-from workloads.workload import Workload
-from constants import READ, INSERT
+from pymongo import read_concern, write_concern
+
+from constants import INSERT, READ
 from utils import transactional
+from workloads.workload import Workload
 
 
 class Workload_E(Workload):

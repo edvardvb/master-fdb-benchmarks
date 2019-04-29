@@ -4,7 +4,6 @@ from datetime import datetime
 from constants import DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO
 from setup import get_database, get_workload
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "-runners",
@@ -27,7 +26,9 @@ now = datetime.now()
 
 
 for runner in args.runners:
-    print(f"🚀 Running {len(args.workloads)} workload{'s' if len(args.workloads) > 1 else ''} on runner {runner}")
+    print(
+        f"🚀 Running {len(args.workloads)} workload{'s' if len(args.workloads) > 1 else ''} on runner {runner}"
+    )
     print()
     db = get_database(runner)
     for wl in args.workloads:

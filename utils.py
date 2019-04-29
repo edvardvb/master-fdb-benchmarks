@@ -1,5 +1,6 @@
-import random
 import inspect
+import random
+
 import pymongo as pm
 
 

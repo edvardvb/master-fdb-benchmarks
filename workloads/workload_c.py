@@ -1,7 +1,7 @@
-from pymongo import write_concern, read_concern
+from pymongo import read_concern, write_concern
 
-from workloads.workload import Workload
 from utils import transactional
+from workloads.workload import Workload
 
 
 class Workload_C(Workload):

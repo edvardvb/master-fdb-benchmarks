@@ -1,4 +1,4 @@
-from pymongo import MongoClient, write_concern, read_concern
+from pymongo import MongoClient, read_concern, write_concern
 
 from constants import DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO
 from workloads.workload_a import Workload_A
