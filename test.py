@@ -20,9 +20,5 @@ for runner in args.runners:
     for wl in args.workloads:
         print(f'👨‍🎓 Preparing workload {wl.upper()}')
         workload = get_workload(wl, db, runner)
-        runtime, throughput, output = workload.benchmark()
+        workload.benchmark()
 
-        print(output)
-        print(f'⏱  Runtime: {runtime}')
-        print(f'🏎  Throughput: {throughput}')
-        print()

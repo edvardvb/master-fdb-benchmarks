@@ -31,24 +31,18 @@ class Workload(ABC):
         runtime, output = timeit.timeit(getattr(self, f'benchmark_{self.runner}'), number=1)
 
         throughput = self.operations/runtime
-        date = datetime.now()
-        with open(
-                f'runs/{self.runner}/{self.__repr__()[-1]} {date.year}-{date.month}-{date.day} {date.hour}:{date.minute}',
-                'w') \
-                as f:
+        print(output)
+        print(f'⏱  Runtime: {runtime}')
+        print(f'🏎  Throughput: {throughput}')
+        print()
 
-            f.write(f'Runtime;{runtime}\n' +
-                    f'Operations;{self.operations}\n' +
-                    f'Throughput;{throughput}\n' +
-                    f'Number of reads;{self.num_read}\n' +
-                    f'Number of updates; {self.num_update}\n' +
-                    f'Number of inserts; {self.num_insert}\n' +
-                    f'Average scan length; {self.total_scan_length/self.num_read}\n'
-                    )
+        filename = self.get_filename()
+        outstring = self.get_outstring(runtime)
+
+        with open(filename, 'w') as f:
+            f.write(outstring)
 
         self.collection.drop()
-
-        return runtime, throughput, output
 
     @abstractmethod
     def benchmark_mongo3(self):
@@ -61,3 +55,27 @@ class Workload(ABC):
     @abstractmethod
     def benchmark_fdbdl(self):
         pass
+
+    def get_outstring(self, runtime):
+        outstring = (f'Runtime;{runtime}\n' +
+                     f'Operations;{self.operations}\n' +
+                     f'Throughput;{self.operations/runtime}\n' +
+                     f'Number of reads;{self.num_read}\n'
+                     )
+        if self.num_update:
+            outstring += f'Number of updates; {self.num_update}\n'
+        if self.num_insert:
+            outstring += f'Number of inserts; {self.num_insert}\n'
+        if self.total_scan_length:
+           outstring += f'Average scan length; {self.total_scan_length / self.num_read}\n'
+
+        return outstring
+
+    def get_filename(self):
+        now = datetime.now()
+        path = f'runs/{self.runner}/'
+        date = f'{now.year}-{now.month}-{now.day}'
+        hour = now.hour if now.hour > 9 else f'0{now.hour}'
+        minute = now.minute if now.minute > 9 else f'0{now.minute}'
+        time = f'{hour}:{minute}'
+        return f'{path}{self.__repr__()[-1]} {date} {time}.csv'
