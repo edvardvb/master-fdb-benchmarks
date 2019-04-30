@@ -27,13 +27,14 @@ class Workload_F(Workload):
     def benchmark_mongo3(self):
         ops = random.choices([READ, READMOD], [50, 50], k=self.operations)
         for i, op in enumerate(ops):
+            random_id = random.randint(1,self.records)
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({"item": i // 100})
+                self.collection.find_one({"item": random_id})
             elif op == READMOD:
                 self.num_readmod += 1
                 self.collection.find_one_and_update(
-                    {"item": i // 100}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"item": random_id}, {"$set": {"title": f"Updated at operation {i}"}}
                 )
         return (
             f"📖 Number of reads: {self.num_read}\n"
@@ -52,15 +53,16 @@ class Workload_F(Workload):
                 ops = random.choices([READ, READMOD], [50, 50], k=batch_size)
                 with session.start_transaction(read_concern=rc, write_concern=wc):
                     for op in ops:
+                        random_id = random.randint(1, self.records)
                         if op == READ:
                             self.num_read += 1
                             self.collection.find_one(
-                                {"item": i // 100}, session=session
+                                {"item": random_id}, session=session
                             )
                         elif op == READMOD:
                             self.num_readmod += 1
                             self.collection.find_one_and_update(
-                                {"item": i // 100},
+                                {"item": random_id},
                                 {"$set": {"title": f"Updated at operation {i}"}},
                                 session=session,
                             )
@@ -73,13 +75,14 @@ class Workload_F(Workload):
     @transactional
     def perform_operations(self, db, ops, i):
         for op in ops:
+            random_id = random.randint(1, self.records)
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({"item": i // 100})
+                self.collection.find_one({"item": random_id})
             elif op == READMOD:
                 self.num_readmod += 1
                 self.collection.find_one_and_update(
-                    {"item": i // 100}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"item": random_id}, {"$set": {"title": f"Updated at operation {i}"}}
                 )
 
     def benchmark_fdbdl(self):

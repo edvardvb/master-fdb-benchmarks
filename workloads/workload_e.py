@@ -28,18 +28,19 @@ class Workload_E(Workload):
         ops = random.choices([READ, INSERT], [95, 5], k=self.operations)
         for i, op in enumerate(ops):
             if op == READ:
-                self.num_read += 1
                 scan_length = random.randint(0, 10)
+                random_id = random.randint(1, self.records-scan_length)
+                self.num_read += 1
                 self.run_scan_length += scan_length
-                list(self.collection.find({"item": {"$in": list(range(scan_length))}}))
+                list(self.collection.find({"item": {"$in": list(range(random_id,random_id+scan_length))}}))
             elif op == INSERT:
                 self.num_insert += 1
                 self.collection.insert_one(
                     {
                         "item": self.records + i,
                         "qty": 100 + i,
-                        "tags": ["cotton"],
-                        "title": "How do I create manual workload i.e., Bulk inserts to Collection ",
+                        "tags": ["tag"],
+                        "title": "title",
                     }
                 )
         return (
@@ -61,23 +62,19 @@ class Workload_E(Workload):
                 with session.start_transaction(read_concern=rc, write_concern=wc):
                     for op in ops:
                         if op == READ:
-                            self.num_read += 1
                             scan_length = random.randint(0, 10)
+                            random_id = random.randint(1, self.records - scan_length)
+                            self.num_read += 1
                             self.run_scan_length += scan_length
-                            list(
-                                self.collection.find(
-                                    {"item": {"$in": list(range(scan_length))}},
-                                    session=session,
-                                )
-                            )
+                            list(self.collection.find({"item": {"$in": list(range(random_id, random_id+scan_length))}}, session=session))
                         elif op == INSERT:
                             self.num_insert += 1
                             self.collection.insert_one(
                                 {
                                     "item": self.records + i,
                                     "qty": 100 + i,
-                                    "tags": ["cotton"],
-                                    "title": "How do I create manual workload i.e., Bulk inserts to Collection ",
+                                    "tags": ["tag"],
+                                    "title": "title",
                                 },
                                 session=session,
                             )
@@ -92,18 +89,19 @@ class Workload_E(Workload):
     def perform_operations(self, db, ops, i):
         for op in ops:
             if op == READ:
-                self.num_read += 1
                 scan_length = random.randint(0, 10)
+                random_id = random.randint(1, self.records-scan_length)
+                self.num_read += 1
                 self.run_scan_length += scan_length
-                list(self.collection.find({"item": {"$in": list(range(scan_length))}}))
+                list(self.collection.find({"item": {"$in": list(range(random_id,random_id+scan_length))}}))
             elif op == INSERT:
                 self.num_insert += 1
                 self.collection.insert_one(
                     {
                         "item": self.records + i,
                         "qty": 100 + i,
-                        "tags": ["cotton"],
-                        "title": "How do I create manual workload i.e., Bulk inserts to Collection ",
+                        "tags": ["tag"],
+                        "title": "title",
                     }
                 )
 

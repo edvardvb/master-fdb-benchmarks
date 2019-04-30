@@ -1,3 +1,4 @@
+import random
 from pymongo import read_concern, write_concern
 
 from utils import transactional
@@ -23,8 +24,9 @@ class Workload_C(Workload):
 
     def benchmark_mongo3(self):
         for i in range(self.operations):
+            random_id = random.randint(1,self.records)
             self.num_read += 1
-            self.collection.find_one({"item": i // 100})
+            self.collection.find_one({"item": random_id})
 
         return (
             f"📖 Number of reads: {self.num_read}\n"
@@ -34,16 +36,17 @@ class Workload_C(Workload):
     def benchmark_mongo4(self):
         rc = read_concern.ReadConcern("majority")
         wc = write_concern.WriteConcern("majority")
-        batch_size = 5000
+        batch_size = 1000
         print(f"Batch size: {batch_size}")
 
         with self.collection.database.client.start_session() as session:
             for i in range(int(self.operations / batch_size)):
                 with session.start_transaction(read_concern=rc, write_concern=wc):
                     for j in range(batch_size):
+                        random_id = random.randint(1, self.records)
                         self.num_read += 1
                         self.collection.find_one(
-                            {"item": i * j // 100}, session=session
+                            {"item": random_id}, session=session
                         )
 
             return (
@@ -52,16 +55,17 @@ class Workload_C(Workload):
             )
 
     @transactional
-    def perform_operations(self, db, batch_size, i):
+    def perform_operations(self, db, batch_size):
         for j in range(batch_size):
+            random_id = random.randint(1,self.records)
             self.num_read += 1
-            self.collection.find_one({"item": i * j // 100})
+            self.collection.find_one({"item": random_id})
 
     def benchmark_fdbdl(self):
-        batch_size = 5000
+        batch_size = 1000
         print(f"Batch size: {batch_size}")
         for i in range(int(self.operations / batch_size)):
-            self.perform_operations(self.db, batch_size, i)
+            self.perform_operations(self.db, batch_size)
         return (
             f"📖 Number of reads: {self.num_read}\n"
             + f"🔎 {(self.num_read / self.operations) * 100}% reads"

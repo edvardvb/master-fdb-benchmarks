@@ -27,13 +27,14 @@ class Workload_A(Workload):
     def benchmark_mongo3(self):
         ops = random.choices([READ, UPDATE], [50, 50], k=self.operations)
         for i, op in enumerate(ops):
+            random_id = random.randint(1,self.records)
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({"item": i // 100})
+                self.collection.find_one({"item": random_id})
             elif op == UPDATE:
                 self.num_update += 1
                 self.collection.update_one(
-                    {"item": i // 100}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"item": random_id}, {"$set": {"title": f"Updated at operation {i}"}}
                 )
         return (
             f"📖 Number of reads: {self.num_read}\n"
@@ -44,7 +45,7 @@ class Workload_A(Workload):
     def benchmark_mongo4(self):
         rc = read_concern.ReadConcern("majority")
         wc = write_concern.WriteConcern("majority")
-        batch_size = 5000
+        batch_size = 1000
         print(f"Batch size: {batch_size}")
 
         with self.collection.database.client.start_session() as session:
@@ -52,15 +53,16 @@ class Workload_A(Workload):
                 ops = random.choices([READ, UPDATE], [50, 50], k=batch_size)
                 with session.start_transaction(read_concern=rc, write_concern=wc):
                     for op in ops:
+                        random_id = random.randint(1, self.records)
                         if op == READ:
                             self.num_read += 1
                             self.collection.find_one(
-                                {"item": i // 100}, session=session
+                                {"item": random_id}, session=session
                             )
                         elif op == UPDATE:
                             self.num_update += 1
                             self.collection.update_one(
-                                {"item": i // 100},
+                                {"item": random_id},
                                 {"$set": {"title": f"Updated at operation {i}"}},
                                 session=session,
                             )
@@ -73,17 +75,18 @@ class Workload_A(Workload):
     @transactional
     def perform_operations(self, db, ops, i):
         for op in ops:
+            random_id = random.randint(1,self.records)
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({"_id": i // 100})
+                self.collection.find_one({"_id": random_id})
             elif op == UPDATE:
                 self.num_update += 1
                 self.collection.update_one(
-                    {"_id": i // 100}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"_id": random_id}, {"$set": {"title": f"Updated at operation {i}"}}
                 )
 
     def benchmark_fdbdl(self):
-        batch_size = 5000
+        batch_size = 1000
         print(f"Batch size: {batch_size}")
         for i in range(int(self.operations / batch_size)):
             ops = random.choices([READ, UPDATE], [50, 50], k=batch_size)

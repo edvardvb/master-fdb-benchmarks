@@ -131,11 +131,11 @@ class Workload(ABC):
             outstring += f"Total number of read-modify-writes;{total_readmods}\n"
 
         outstring += (
-            f"Read percentage;{(self.num_read / (self.operations*num_runs)) * 100}%"
+            f"Read percentage;{(total_reads / (self.operations*num_runs)) * 100}%\n"
         )
 
         if total_scan_length:
-            outstring += f"Average scan length;{total_scan_length / self.num_read}\n"
+            outstring += f"Average scan length;{total_scan_length / total_reads}\n"
 
         return outstring
 

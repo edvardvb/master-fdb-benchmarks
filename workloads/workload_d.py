@@ -28,8 +28,9 @@ class Workload_D(Workload):
         ops = random.choices([READ, INSERT], [95, 5], k=self.operations)
         for i, op in enumerate(ops):
             if op == READ:
+                random_id = random.randint(1,self.records)
                 self.num_read += 1
-                self.collection.find_one({"item": i // 100})
+                self.collection.find_one({"item": random_id})
 
             elif op == INSERT:
                 self.num_insert += 1
@@ -37,8 +38,8 @@ class Workload_D(Workload):
                     {
                         "item": self.records + i,
                         "qty": 100 + i,
-                        "tags": ["cotton"],
-                        "title": "How do I create manual workload i.e., Bulk inserts to Collection ",
+                        "tags": ["tag"],
+                        "title": "title",
                     }
                 )
         return (
@@ -50,7 +51,7 @@ class Workload_D(Workload):
     def benchmark_mongo4(self):
         rc = read_concern.ReadConcern("majority")
         wc = write_concern.WriteConcern("majority")
-        batch_size = 5000
+        batch_size = 1000
         print(f"Batch size: {batch_size}")
 
         with self.collection.database.client.start_session() as session:
@@ -59,9 +60,10 @@ class Workload_D(Workload):
                 with session.start_transaction(read_concern=rc, write_concern=wc):
                     for op in ops:
                         if op == READ:
+                            random_id = random.randint(1, self.records)
                             self.num_read += 1
                             self.collection.find_one(
-                                {"item": i // 100}, session=session
+                                {"item": random_id}, session=session
                             )
                         elif op == INSERT:
                             self.num_insert += 1
@@ -69,8 +71,8 @@ class Workload_D(Workload):
                                 {
                                     "item": self.records + i,
                                     "qty": 100 + i,
-                                    "tags": ["cotton"],
-                                    "title": "How do I create manual workload i.e., Bulk inserts to Collection ",
+                                    "tags": ["tag"],
+                                    "title": "title",
                                 },
                                 session=session,
                             )
@@ -84,21 +86,22 @@ class Workload_D(Workload):
     def perform_operations(self, db, ops, i):
         for op in ops:
             if op == READ:
+                random_id = random.randint(1,self.records)
                 self.num_read += 1
-                self.collection.find_one({"item": i // 100})
+                self.collection.find_one({"item": random_id})
             elif op == INSERT:
                 self.num_insert += 1
                 self.collection.insert_one(
                     {
                         "item": self.records + i,
                         "qty": 100 + i,
-                        "tags": ["cotton"],
-                        "title": "How do I create manual workload i.e., Bulk inserts to Collection ",
+                        "tags": ["tag"],
+                        "title": "title",
                     }
                 )
 
     def benchmark_fdbdl(self):
-        batch_size = 5000
+        batch_size = 1000
         print(f"Batch size: {batch_size}")
         for i in range(int(self.operations / batch_size)):
             ops = random.choices([READ, INSERT], [95, 5], k=batch_size)
