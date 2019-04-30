@@ -17,6 +17,7 @@ class Workload(ABC):
         self.num_read = 0
         self.num_update = 0
         self.num_insert = 0
+        self.num_readmod = 0
         self.run_scan_length = 0
 
     def setup(self, run):
@@ -24,6 +25,7 @@ class Workload(ABC):
         self.num_read = 0
         self.num_update = 0
         self.num_insert = 0
+        self.num_readmod = 0
         self.run_scan_length = 0
         self.collection.drop()
         print(f"🧹  Collection cleaned")
@@ -41,6 +43,7 @@ class Workload(ABC):
         total_reads = 0
         total_updates = 0
         total_inserts = 0
+        total_readmods = 0
         total_runtime = 0
         total_scan_length = 0
 
@@ -55,6 +58,7 @@ class Workload(ABC):
             total_reads += self.num_read
             total_updates += self.num_update
             total_inserts += self.num_insert
+            total_readmods += self.num_readmod
             total_runtime += runtime
             total_scan_length += self.run_scan_length
             throughput = self.operations / runtime
@@ -77,6 +81,7 @@ class Workload(ABC):
             total_reads,
             total_updates,
             total_inserts,
+            total_readmods,
             total_runtime,
             total_scan_length,
             num_runs,
@@ -104,6 +109,7 @@ class Workload(ABC):
         total_reads,
         total_updates,
         total_inserts,
+        total_readmods,
         total_runtime,
         total_scan_length,
         num_runs,
@@ -121,6 +127,13 @@ class Workload(ABC):
             outstring += f"Total number of updates;{total_updates}\n"
         if total_inserts:
             outstring += f"Total number of inserts;{total_inserts}\n"
+        if total_inserts:
+            outstring += f"Total number of read-modify-writes;{total_readmods}\n"
+
+        outstring += (
+            f"Read percentage;{(self.num_read / (self.operations*num_runs)) * 100}%"
+        )
+
         if total_scan_length:
             outstring += f"Average scan length;{total_scan_length / self.num_read}\n"
 

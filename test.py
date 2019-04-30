@@ -12,7 +12,7 @@ parser.add_argument(
     choices=[DOCUMENT_LAYER, STANDARD_MONGO, TRANSACTIONAL_MONGO],
 )
 parser.add_argument(
-    "-workloads", nargs="+", required=True, choices=["a", "b", "c", "d", "e"]
+    "-workloads", nargs="+", required=True, choices=["a", "b", "c", "d", "e", "f"]
 )
 parser.add_argument("-num_runs", type=int)
 args = parser.parse_args()
