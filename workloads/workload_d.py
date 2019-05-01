@@ -26,6 +26,7 @@ class Workload_D(Workload):
 
     def benchmark_mongo3(self):
         ops = random.choices([READ, INSERT], [95, 5], k=self.operations)
+        inserts = []
         for i, op in enumerate(ops):
             if op == READ:
                 random_id = random.randint(1,self.records)
@@ -34,14 +35,14 @@ class Workload_D(Workload):
 
             elif op == INSERT:
                 self.num_insert += 1
-                self.collection.insert_one(
-                    {
+                inserts.append({
                         "item": self.records + i,
                         "qty": 100 + i,
                         "tags": ["tag"],
                         "title": "title",
-                    }
-                )
+                    })
+        if inserts:
+            self.collection.insert_many(inserts)
         return (
             f"📖 Number of reads: {self.num_read}\n"
             + f"✍️  Number of inserts: {self.num_insert}\n"
@@ -58,6 +59,7 @@ class Workload_D(Workload):
             for i in range(int(self.operations / batch_size)):
                 ops = random.choices([READ, INSERT], [95, 5], k=batch_size)
                 with session.start_transaction(read_concern=rc, write_concern=wc):
+                    inserts = []
                     for op in ops:
                         if op == READ:
                             random_id = random.randint(1, self.records)
@@ -67,15 +69,15 @@ class Workload_D(Workload):
                             )
                         elif op == INSERT:
                             self.num_insert += 1
-                            self.collection.insert_one(
-                                {
+                            inserts.append({
                                     "item": self.records + i,
                                     "qty": 100 + i,
                                     "tags": ["tag"],
                                     "title": "title",
-                                },
-                                session=session,
-                            )
+                                })
+                    if inserts:
+                        self.collection.insert_many(inserts, session=session)
+
             return (
                 f"📖 Number of reads: {self.num_read}\n"
                 + f"✍️  Number of inserts: {self.num_insert}\n"
@@ -84,6 +86,7 @@ class Workload_D(Workload):
 
     @transactional
     def perform_operations(self, db, ops, i):
+        inserts = []
         for op in ops:
             if op == READ:
                 random_id = random.randint(1,self.records)
@@ -91,14 +94,14 @@ class Workload_D(Workload):
                 self.collection.find_one({"item": random_id})
             elif op == INSERT:
                 self.num_insert += 1
-                self.collection.insert_one(
-                    {
+                inserts.append({
                         "item": self.records + i,
                         "qty": 100 + i,
                         "tags": ["tag"],
                         "title": "title",
-                    }
-                )
+                    })
+        if inserts:
+            self.collection.insert_many(inserts)
 
     def benchmark_fdbdl(self):
         batch_size = 1000

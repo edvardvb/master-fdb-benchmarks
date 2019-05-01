@@ -15,6 +15,8 @@ parser.add_argument(
     "-workloads", nargs="+", required=True, choices=["a", "b", "c", "d", "e", "f"]
 )
 parser.add_argument("-num_runs", type=int)
+parser.add_argument("-no_write", action="store_false")
+
 args = parser.parse_args()
 
 print(args.runners)
@@ -35,4 +37,4 @@ for runner in args.runners:
         print(f"== 👨‍🎓 Preparing workload {wl.upper()} ==")
         print()
         workload = get_workload(wl, db, runner)
-        workload.benchmark(now, args.num_runs)
+        workload.benchmark(now, args.num_runs, args.no_write)

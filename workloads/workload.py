@@ -36,7 +36,7 @@ class Workload(ABC):
             f"🚄 Performing {self.operations} operations, using runner {self.runner} on {self.__repr__()}"
         )
 
-    def benchmark(self, now, num_runs):
+    def benchmark(self, now, num_runs, write):
         if not num_runs:
             num_runs = 5
 
@@ -76,19 +76,21 @@ class Workload(ABC):
         print(f"🏎  Average throughput: {(self.operations)/avg_runtime}")
         print()
 
-        filename = self.get_filename(now)
-        outstring = self.get_outstring(
-            total_reads,
-            total_updates,
-            total_inserts,
-            total_readmods,
-            total_runtime,
-            total_scan_length,
-            num_runs,
-        )
+        if write:
+            filename = self.get_filename(now)
+            outstring = self.get_outstring(
+                total_reads,
+                total_updates,
+                total_inserts,
+                total_readmods,
+                total_runtime,
+                total_scan_length,
+                num_runs,
+            )
 
-        with open(filename, "w") as f:
-            f.write(outstring)
+            with open(filename, "w") as f:
+                f.write(outstring)
+
 
         self.collection.drop()
 
