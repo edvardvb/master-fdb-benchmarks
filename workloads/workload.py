@@ -1,7 +1,7 @@
 import time
-import numpy
 from abc import ABC, abstractmethod
 
+import numpy
 from pymongo import ASCENDING
 
 from utils import generate_data
@@ -38,10 +38,10 @@ class Workload(ABC):
         print(
             f"🚄 Performing {self.operations} operations, using runner {self.runner} on {self.__repr__()}"
         )
-        self.read_id = self.collection.find_one().get('_id')
+        self.read_id = self.collection.find_one().get("_id")
 
         zipf_set = numpy.random.zipf(2, self.operations)
-        normalized = (zipf_set/float(max(zipf_set)))*999
+        normalized = (zipf_set / float(max(zipf_set))) * 999
         self.op_set = [int(e) for e in normalized]
 
     def benchmark(self, now, num_runs, write):
@@ -98,7 +98,6 @@ class Workload(ABC):
 
             with open(filename, "w") as f:
                 f.write(outstring)
-
 
         self.collection.drop()
 

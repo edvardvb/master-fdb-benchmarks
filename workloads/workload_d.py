@@ -33,12 +33,14 @@ class Workload_D(Workload):
                 self.collection.find_one({"_id": self.read_id})
             elif op == INSERT:
                 self.num_insert += 1
-                self.read_id =self.collection.insert_one({
+                self.read_id = self.collection.insert_one(
+                    {
                         "item": self.records + i,
                         "qty": 100 + i,
                         "tags": ["tag"],
                         "title": "title",
-                    }).inserted_id
+                    }
+                ).inserted_id
         return (
             f"📖 Number of reads: {self.num_read}\n"
             + f"✍️  Number of inserts: {self.num_insert}\n"
@@ -58,15 +60,19 @@ class Workload_D(Workload):
                     for op in ops:
                         if op == READ:
                             self.num_read += 1
-                            self.collection.find_one({"_id": self.read_id}, session=session)
+                            self.collection.find_one(
+                                {"_id": self.read_id}, session=session
+                            )
                         elif op == INSERT:
                             self.num_insert += 1
-                            self.read_id = self.collection.insert_one({
+                            self.read_id = self.collection.insert_one(
+                                {
                                     "item": self.records + i,
                                     "qty": 100 + i,
                                     "tags": ["tag"],
                                     "title": "title",
-                                }).inserted_id
+                                }
+                            ).inserted_id
 
             return (
                 f"📖 Number of reads: {self.num_read}\n"
@@ -82,12 +88,14 @@ class Workload_D(Workload):
                 self.collection.find_one({"_id": self.read_id})
             elif op == INSERT:
                 self.num_insert += 1
-                self.read_id = self.collection.insert_one({
+                self.read_id = self.collection.insert_one(
+                    {
                         "item": self.records + i,
                         "qty": 100 + i,
                         "tags": ["tag"],
                         "title": "title",
-                    }).inserted_id
+                    }
+                ).inserted_id
 
     def benchmark_fdbdl(self):
         batch_size = 1000

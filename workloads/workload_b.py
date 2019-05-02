@@ -34,7 +34,8 @@ class Workload_B(Workload):
             elif op == UPDATE:
                 self.num_update += 1
                 self.collection.update_one(
-                    {"item": self.op_set.pop()}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"item": self.op_set.pop()},
+                    {"$set": {"title": f"Updated at operation {i}"}},
                 )
         return (
             f"📖 Number of reads: {self.num_read}\n"
@@ -80,7 +81,8 @@ class Workload_B(Workload):
             elif op == UPDATE:
                 self.num_update += 1
                 self.collection.update_one(
-                    {"item": self.op_set.pop()}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"item": self.op_set.pop()},
+                    {"$set": {"title": f"Updated at operation {i}"}},
                 )
 
     def benchmark_fdbdl(self):

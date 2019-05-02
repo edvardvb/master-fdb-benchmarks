@@ -33,7 +33,8 @@ class Workload_F(Workload):
             elif op == READMOD:
                 self.num_readmod += 1
                 self.collection.find_one_and_update(
-                    {"item": self.op_set.pop()}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"item": self.op_set.pop()},
+                    {"$set": {"title": f"Updated at operation {i}"}},
                 )
         return (
             f"📖 Number of reads: {self.num_read}\n"
@@ -79,7 +80,8 @@ class Workload_F(Workload):
             elif op == READMOD:
                 self.num_readmod += 1
                 self.collection.find_one_and_update(
-                    {"item": self.op_set.pop()}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"item": self.op_set.pop()},
+                    {"$set": {"title": f"Updated at operation {i}"}},
                 )
 
     def benchmark_fdbdl(self):

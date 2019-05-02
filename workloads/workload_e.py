@@ -36,15 +36,21 @@ class Workload_E(Workload):
                     start_id = start_id - ((start_id + scan_length) - self.records)
                 self.num_read += 1
                 self.run_scan_length += scan_length
-                list(self.collection.find({"item": {"$in": list(range(start_id, start_id+scan_length))}}))
+                list(
+                    self.collection.find(
+                        {"item": {"$in": list(range(start_id, start_id + scan_length))}}
+                    )
+                )
             elif op == INSERT:
                 self.num_insert += 1
-                inserts.append({
-                    "item": self.records + i,
-                    "qty": 100 + i,
-                    "tags": ["tag"],
-                    "title": "title",
-                })
+                inserts.append(
+                    {
+                        "item": self.records + i,
+                        "qty": 100 + i,
+                        "tags": ["tag"],
+                        "title": "title",
+                    }
+                )
         if inserts:
             self.collection.insert_many(inserts)
         return (
@@ -70,18 +76,33 @@ class Workload_E(Workload):
                             scan_length = random.randint(0, 10)
                             start_id = self.op_set.pop()
                             if start_id + scan_length > self.records:
-                                start_id = start_id - ((start_id + scan_length) - self.records)
+                                start_id = start_id - (
+                                    (start_id + scan_length) - self.records
+                                )
                             self.num_read += 1
                             self.run_scan_length += scan_length
-                            list(self.collection.find({"item": {"$in": list(range(start_id, start_id + scan_length))}}, session=session))
+                            list(
+                                self.collection.find(
+                                    {
+                                        "item": {
+                                            "$in": list(
+                                                range(start_id, start_id + scan_length)
+                                            )
+                                        }
+                                    },
+                                    session=session,
+                                )
+                            )
                         elif op == INSERT:
                             self.num_insert += 1
-                            inserts.append({
-                                "item": self.records + i,
-                                "qty": 100 + i,
-                                "tags": ["tag"],
-                                "title": "title",
-                            })
+                            inserts.append(
+                                {
+                                    "item": self.records + i,
+                                    "qty": 100 + i,
+                                    "tags": ["tag"],
+                                    "title": "title",
+                                }
+                            )
                     if inserts:
                         self.collection.insert_many(inserts, session=session)
             return (
@@ -102,15 +123,21 @@ class Workload_E(Workload):
                     start_id = start_id - ((start_id + scan_length) - self.records)
                 self.num_read += 1
                 self.run_scan_length += scan_length
-                list(self.collection.find({"item": {"$in": list(range(start_id, start_id+scan_length))}}))
+                list(
+                    self.collection.find(
+                        {"item": {"$in": list(range(start_id, start_id + scan_length))}}
+                    )
+                )
             elif op == INSERT:
                 self.num_insert += 1
-                inserts.append({
-                    "item": self.records + i,
-                    "qty": 100 + i,
-                    "tags": ["tag"],
-                    "title": "title",
-                })
+                inserts.append(
+                    {
+                        "item": self.records + i,
+                        "qty": 100 + i,
+                        "tags": ["tag"],
+                        "title": "title",
+                    }
+                )
         if inserts:
             self.collection.insert_many(inserts)
 
