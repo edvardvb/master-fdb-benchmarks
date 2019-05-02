@@ -12,6 +12,7 @@ class Workload_E(Workload):
       95/5 scanning_read/insert
       1000 records
       10000 operations
+      zipfian, batched inserts
       :return:
     """
 
@@ -30,10 +31,12 @@ class Workload_E(Workload):
         for i, op in enumerate(ops):
             if op == READ:
                 scan_length = random.randint(0, 10)
-                random_id = random.randint(1, self.records-scan_length)
+                start_id = self.op_set.pop()
+                if start_id + scan_length > self.records:
+                    start_id = start_id - ((start_id + scan_length) - self.records)
                 self.num_read += 1
                 self.run_scan_length += scan_length
-                list(self.collection.find({"item": {"$in": list(range(random_id,random_id+scan_length))}}))
+                list(self.collection.find({"item": {"$in": list(range(start_id, start_id+scan_length))}}))
             elif op == INSERT:
                 self.num_insert += 1
                 inserts.append({
@@ -65,10 +68,12 @@ class Workload_E(Workload):
                     for op in ops:
                         if op == READ:
                             scan_length = random.randint(0, 10)
-                            random_id = random.randint(1, self.records - scan_length)
+                            start_id = self.op_set.pop()
+                            if start_id + scan_length > self.records:
+                                start_id = start_id - ((start_id + scan_length) - self.records)
                             self.num_read += 1
                             self.run_scan_length += scan_length
-                            list(self.collection.find({"item": {"$in": list(range(random_id, random_id+scan_length))}}, session=session))
+                            list(self.collection.find({"item": {"$in": list(range(start_id, start_id + scan_length))}}, session=session))
                         elif op == INSERT:
                             self.num_insert += 1
                             inserts.append({
@@ -92,10 +97,12 @@ class Workload_E(Workload):
         for op in ops:
             if op == READ:
                 scan_length = random.randint(0, 10)
-                random_id = random.randint(1, self.records-scan_length)
+                start_id = self.op_set.pop()
+                if start_id + scan_length > self.records:
+                    start_id = start_id - ((start_id + scan_length) - self.records)
                 self.num_read += 1
                 self.run_scan_length += scan_length
-                list(self.collection.find({"item": {"$in": list(range(random_id,random_id+scan_length))}}))
+                list(self.collection.find({"item": {"$in": list(range(start_id, start_id+scan_length))}}))
             elif op == INSERT:
                 self.num_insert += 1
                 inserts.append({

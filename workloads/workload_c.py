@@ -10,6 +10,7 @@ class Workload_C(Workload):
       100/0 read/update
       1000 records
       10000 operations
+      zipfian
       :return:
     """
 
@@ -24,9 +25,8 @@ class Workload_C(Workload):
 
     def benchmark_mongo3(self):
         for i in range(self.operations):
-            random_id = random.randint(1,self.records)
             self.num_read += 1
-            self.collection.find_one({"item": random_id})
+            self.collection.find_one({"item": self.op_set.pop()})
 
         return (
             f"📖 Number of reads: {self.num_read}\n"
@@ -43,10 +43,9 @@ class Workload_C(Workload):
             for i in range(int(self.operations / batch_size)):
                 with session.start_transaction(read_concern=rc, write_concern=wc):
                     for j in range(batch_size):
-                        random_id = random.randint(1, self.records)
                         self.num_read += 1
                         self.collection.find_one(
-                            {"item": random_id}, session=session
+                            {"item": self.op_set.pop()}, session=session
                         )
 
             return (
@@ -57,9 +56,8 @@ class Workload_C(Workload):
     @transactional
     def perform_operations(self, db, batch_size):
         for j in range(batch_size):
-            random_id = random.randint(1,self.records)
             self.num_read += 1
-            self.collection.find_one({"item": random_id})
+            self.collection.find_one({"item": self.op_set.pop()})
 
     def benchmark_fdbdl(self):
         batch_size = 1000

@@ -12,6 +12,7 @@ class Workload_A(Workload):
       50/50 read/update
       1000 records
       10000 operations
+      zipfian
       :return:
     """
 
@@ -27,14 +28,13 @@ class Workload_A(Workload):
     def benchmark_mongo3(self):
         ops = random.choices([READ, UPDATE], [50, 50], k=self.operations)
         for i, op in enumerate(ops):
-            random_id = random.randint(1,self.records)
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({"item": random_id})
+                self.collection.find_one({"item": self.op_set.pop()})
             elif op == UPDATE:
                 self.num_update += 1
                 self.collection.update_one(
-                    {"item": random_id}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"item": self.op_set.pop()}, {"$set": {"title": f"Updated at operation {i}"}}
                 )
         return (
             f"📖 Number of reads: {self.num_read}\n"
@@ -53,16 +53,15 @@ class Workload_A(Workload):
                 ops = random.choices([READ, UPDATE], [50, 50], k=batch_size)
                 with session.start_transaction(read_concern=rc, write_concern=wc):
                     for op in ops:
-                        random_id = random.randint(1, self.records)
                         if op == READ:
                             self.num_read += 1
                             self.collection.find_one(
-                                {"item": random_id}, session=session
+                                {"item": self.op_set.pop()}, session=session
                             )
                         elif op == UPDATE:
                             self.num_update += 1
                             self.collection.update_one(
-                                {"item": random_id},
+                                {"item": self.op_set.pop()},
                                 {"$set": {"title": f"Updated at operation {i}"}},
                                 session=session,
                             )
@@ -75,14 +74,13 @@ class Workload_A(Workload):
     @transactional
     def perform_operations(self, db, ops, i):
         for op in ops:
-            random_id = random.randint(1,self.records)
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({"_id": random_id})
+                self.collection.find_one({"item": self.op_set.pop()})
             elif op == UPDATE:
                 self.num_update += 1
                 self.collection.update_one(
-                    {"_id": random_id}, {"$set": {"title": f"Updated at operation {i}"}}
+                    {"item": self.op_set.pop()}, {"$set": {"title": f"Updated at operation {i}"}}
                 )
 
     def benchmark_fdbdl(self):

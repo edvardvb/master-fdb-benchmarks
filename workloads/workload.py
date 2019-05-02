@@ -1,4 +1,5 @@
 import time
+import numpy
 from abc import ABC, abstractmethod
 
 from pymongo import ASCENDING
@@ -19,6 +20,8 @@ class Workload(ABC):
         self.num_insert = 0
         self.num_readmod = 0
         self.run_scan_length = 0
+        self.read_id = None
+        self.op_set = None
 
     def setup(self, run):
         print(f"🔌 Setting up for run {run}")
@@ -35,6 +38,11 @@ class Workload(ABC):
         print(
             f"🚄 Performing {self.operations} operations, using runner {self.runner} on {self.__repr__()}"
         )
+        self.read_id = self.collection.find_one().get('_id')
+
+        zipf_set = numpy.random.zipf(2, self.operations)
+        normalized = (zipf_set/float(max(zipf_set)))*999
+        self.op_set = [int(e) for e in normalized]
 
     def benchmark(self, now, num_runs, write):
         if not num_runs:
@@ -129,7 +137,7 @@ class Workload(ABC):
             outstring += f"Total number of updates;{total_updates}\n"
         if total_inserts:
             outstring += f"Total number of inserts;{total_inserts}\n"
-        if total_inserts:
+        if total_readmods:
             outstring += f"Total number of read-modify-writes;{total_readmods}\n"
 
         outstring += (
