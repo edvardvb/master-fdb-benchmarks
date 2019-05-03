@@ -25,24 +25,19 @@ class Workload(ABC):
 
     def setup(self, run):
         print(f"🔌 Setting up for run {run}")
-        self.num_read = 0
-        self.num_update = 0
-        self.num_insert = 0
-        self.num_readmod = 0
-        self.run_scan_length = 0
-        self.collection.drop()
-        print(f"🧹  Collection cleaned")
+        self.reset()
+
         generate_data(self.records, self.collection)
         self.collection.create_index([("item", ASCENDING)])
         print("🧮  Index built on `item`")
+
         print(
             f"🚄 Performing {self.operations} operations, using runner {self.runner} on {self.__repr__()}"
         )
-        self.read_id = self.collection.find_one().get("_id")
 
-        zipf_set = numpy.random.zipf(2, self.operations)
-        normalized = (zipf_set / float(max(zipf_set))) * 999
-        self.op_set = [int(e) for e in normalized]
+        self.read_id = self.collection.find_one().get("_id")
+        self.generate_op_set()
+
 
     def benchmark(self, now, num_runs, write):
         if not num_runs:
@@ -155,3 +150,17 @@ class Workload(ABC):
         minute = now.minute if now.minute > 9 else f"0{now.minute}"
         time = f"{hour}:{minute}"
         return f"{path}{self.__repr__()[-1]} {date} {time}.csv"
+
+    def reset(self):
+        self.num_read = 0
+        self.num_update = 0
+        self.num_insert = 0
+        self.num_readmod = 0
+        self.run_scan_length = 0
+        self.collection.drop()
+        print(f"🧹  Collection cleaned")
+
+    def generate_op_set(self):
+        zipf_set = numpy.random.zipf(2, self.operations)
+        normalized = (zipf_set / float(max(zipf_set))) * 999
+        self.op_set = [int(e) for e in normalized]
