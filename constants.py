@@ -6,3 +6,10 @@ READ = "read"
 UPDATE = "update"
 INSERT = "insert"
 READMOD = "readmod"
+
+READ_INDEX = 0
+UPDATE_INDEX = 1
+INSERT_INDEX = 2
+READMOD_INDEX = 3
+RUNTIME_INDEX = 4
+SCAN_INDEX = 5

@@ -2,8 +2,15 @@ import time
 from abc import ABC, abstractmethod
 
 import numpy
-from pymongo import ASCENDING
 
+from constants import (
+    INSERT_INDEX,
+    READ_INDEX,
+    READMOD_INDEX,
+    RUNTIME_INDEX,
+    SCAN_INDEX,
+    UPDATE_INDEX,
+)
 from utils import generate_data
 
 
@@ -15,6 +22,7 @@ class Workload(ABC):
         self.records = records
         self.operations = operations
 
+        # COUNTERS AND INITIALS
         self.num_read = 0
         self.num_update = 0
         self.num_insert = 0
@@ -22,14 +30,13 @@ class Workload(ABC):
         self.run_scan_length = 0
         self.read_id = None
         self.op_set = None
+        self.totals = [0] * 6
 
     def setup(self, run):
         print(f"🔌 Setting up for run {run}")
         self.reset()
 
         generate_data(self.records, self.collection)
-        self.collection.create_index([("item", ASCENDING)])
-        print("🧮  Index built on `item`")
 
         print(
             f"🚄 Performing {self.operations} operations, using runner {self.runner} on {self.__repr__()}"
@@ -38,17 +45,9 @@ class Workload(ABC):
         self.read_id = self.collection.find_one().get("_id")
         self.generate_op_set()
 
-
     def benchmark(self, now, num_runs, write):
         if not num_runs:
             num_runs = 5
-
-        total_reads = 0
-        total_updates = 0
-        total_inserts = 0
-        total_readmods = 0
-        total_runtime = 0
-        total_scan_length = 0
 
         for i in range(num_runs):
             self.setup(i + 1)
@@ -58,19 +57,15 @@ class Workload(ABC):
 
             runtime = end - start
 
-            total_reads += self.num_read
-            total_updates += self.num_update
-            total_inserts += self.num_insert
-            total_readmods += self.num_readmod
-            total_runtime += runtime
-            total_scan_length += self.run_scan_length
+            self.increment_totals(runtime)
+
             throughput = self.operations / runtime
             print(output)
             print(f"⏱  Runtime: {runtime}")
             print(f"🏎  Throughput: {throughput}")
             print()
 
-        avg_runtime = total_runtime / num_runs
+        avg_runtime = self.totals[RUNTIME_INDEX] / num_runs
 
         print(
             f"== Summary for {num_runs} run{'s' if num_runs > 1 else ''} of {self.__repr__()} on runner {self.runner} =="
@@ -81,15 +76,7 @@ class Workload(ABC):
 
         if write:
             filename = self.get_filename(now)
-            outstring = self.get_outstring(
-                total_reads,
-                total_updates,
-                total_inserts,
-                total_readmods,
-                total_runtime,
-                total_scan_length,
-                num_runs,
-            )
+            outstring = self.get_outstring(num_runs)
 
             with open(filename, "w") as f:
                 f.write(outstring)
@@ -108,38 +95,41 @@ class Workload(ABC):
     def benchmark_fdbdl(self):
         pass
 
-    def get_outstring(
-        self,
-        total_reads,
-        total_updates,
-        total_inserts,
-        total_readmods,
-        total_runtime,
-        total_scan_length,
-        num_runs,
-    ):
+    def increment_totals(self, runtime):
+        intermediate_results = [
+            self.num_read,
+            self.num_update,
+            self.num_insert,
+            self.num_readmod,
+            runtime,
+            self.run_scan_length,
+        ]
+        for i in range(len(self.totals)):
+            self.totals[i] += intermediate_results[i]
+
+    def get_outstring(self, num_runs):
 
         outstring = (
-            f"Total runtime;{total_runtime}\n"
+            f"Total runtime;{self.totals[RUNTIME_INDEX]}\n"
             + f"Number of runs;{num_runs}\n"
-            + f"Average runtime;{total_runtime/num_runs}\n"
+            + f"Average runtime;{self.totals[RUNTIME_INDEX]/num_runs}\n"
             + f"Operations per run;{self.operations}\n"
-            + f"Average throughput;{(self.operations*num_runs)/total_runtime}\n"
-            + f"Total number of reads;{total_reads}\n"
+            + f"Average throughput;{(self.operations*num_runs)/self.totals[RUNTIME_INDEX]}\n"
+            + f"Total number of reads;{self.totals[READ_INDEX]}\n"
         )
-        if total_updates:
-            outstring += f"Total number of updates;{total_updates}\n"
-        if total_inserts:
-            outstring += f"Total number of inserts;{total_inserts}\n"
-        if total_readmods:
-            outstring += f"Total number of read-modify-writes;{total_readmods}\n"
+        if self.totals[UPDATE_INDEX]:
+            outstring += f"Total number of updates;{self.totals[UPDATE_INDEX]}\n"
+        if self.totals[INSERT_INDEX]:
+            outstring += f"Total number of inserts;{self.totals[INSERT_INDEX]}\n"
+        if self.totals[READMOD_INDEX]:
+            outstring += (
+                f"Total number of read-modify-writes;{self.totals[READMOD_INDEX]}\n"
+            )
 
-        outstring += (
-            f"Read percentage;{(total_reads / (self.operations*num_runs)) * 100}%\n"
-        )
+        outstring += f"Read percentage;{(self.totals[READ_INDEX] / (self.operations*num_runs)) * 100}%\n"
 
-        if total_scan_length:
-            outstring += f"Average scan length;{total_scan_length / total_reads}\n"
+        if self.totals[SCAN_INDEX]:
+            outstring += f"Average scan length;{self.totals[SCAN_INDEX] / self.totals[READ_INDEX]}\n"
 
         return outstring
 

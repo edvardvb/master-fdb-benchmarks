@@ -14,6 +14,9 @@ def generate_data(number_of_records, collection):
     print("👷‍♂️ Dataset generated")
     print(f"🚚 {number_of_records} records inserted")
 
+    collection.create_index([("item", pm.ASCENDING)])
+    print("🧮  Index built on `item`")
+
 
 def transactional(func):
     index = inspect.getargspec(func).args.index("db")
