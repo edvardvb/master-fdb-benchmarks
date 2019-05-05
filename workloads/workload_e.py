@@ -30,7 +30,7 @@ class Workload_E(Workload):
         inserts = []
         for i, op in enumerate(ops):
             if op == READ:
-                scan_length = random.randint(0, 10)
+                scan_length = random.randint(1, 10)
                 start_id = self.req_set.pop()
                 if start_id + scan_length > self.records:
                     start_id = start_id - ((start_id + scan_length) - self.records)
@@ -73,7 +73,7 @@ class Workload_E(Workload):
                     inserts = []
                     for op in ops:
                         if op == READ:
-                            scan_length = random.randint(0, 10)
+                            scan_length = random.randint(1, 10)
                             start_id = self.req_set.pop()
                             if start_id + scan_length > self.records:
                                 start_id = start_id - (
@@ -117,7 +117,7 @@ class Workload_E(Workload):
         inserts = []
         for op in ops:
             if op == READ:
-                scan_length = random.randint(0, 10)
+                scan_length = random.randint(1, 10)
                 start_id = self.req_set.pop()
                 if start_id + scan_length > self.records:
                     start_id = start_id - ((start_id + scan_length) - self.records)
