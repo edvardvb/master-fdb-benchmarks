@@ -27,7 +27,7 @@ class Workload_C(Workload):
     def benchmark_mongo3(self):
         for i in range(self.operations):
             self.num_read += 1
-            self.collection.find_one({"item": self.op_set.pop()})
+            self.collection.find_one({"item": self.req_set.pop()})
 
         return (
             f"📖 Number of reads: {self.num_read}\n"
@@ -46,7 +46,7 @@ class Workload_C(Workload):
                     for j in range(batch_size):
                         self.num_read += 1
                         self.collection.find_one(
-                            {"item": self.op_set.pop()}, session=session
+                            {"item": self.req_set.pop()}, session=session
                         )
 
             return (
@@ -58,7 +58,7 @@ class Workload_C(Workload):
     def perform_operations(self, db, batch_size):
         for j in range(batch_size):
             self.num_read += 1
-            self.collection.find_one({"item": self.op_set.pop()})
+            self.collection.find_one({"item": self.req_set.pop()})
 
     def benchmark_fdbdl(self):
         batch_size = 1000

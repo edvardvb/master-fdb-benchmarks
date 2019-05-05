@@ -29,11 +29,11 @@ class Workload_F(Workload):
         for i, op in enumerate(ops):
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({"item": self.op_set.pop()})
+                self.collection.find_one({"item": self.req_set.pop()})
             elif op == READMOD:
                 self.num_readmod += 1
                 self.collection.find_one_and_update(
-                    {"item": self.op_set.pop()},
+                    {"item": self.req_set.pop()},
                     {"$set": {"title": f"Updated at operation {i}"}},
                 )
         return (
@@ -56,12 +56,12 @@ class Workload_F(Workload):
                         if op == READ:
                             self.num_read += 1
                             self.collection.find_one(
-                                {"item": self.op_set.pop()}, session=session
+                                {"item": self.req_set.pop()}, session=session
                             )
                         elif op == READMOD:
                             self.num_readmod += 1
                             self.collection.find_one_and_update(
-                                {"item": self.op_set.pop()},
+                                {"item": self.req_set.pop()},
                                 {"$set": {"title": f"Updated at operation {i}"}},
                                 session=session,
                             )
@@ -76,11 +76,11 @@ class Workload_F(Workload):
         for op in ops:
             if op == READ:
                 self.num_read += 1
-                self.collection.find_one({"item": self.op_set.pop()})
+                self.collection.find_one({"item": self.req_set.pop()})
             elif op == READMOD:
                 self.num_readmod += 1
                 self.collection.find_one_and_update(
-                    {"item": self.op_set.pop()},
+                    {"item": self.req_set.pop()},
                     {"$set": {"title": f"Updated at operation {i}"}},
                 )
 

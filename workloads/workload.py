@@ -29,7 +29,7 @@ class Workload(ABC):
         self.num_readmod = 0
         self.run_scan_length = 0
         self.read_id = None
-        self.op_set = None
+        self.req_set = None
         self.totals = [0] * 6
 
     def setup(self, run):
@@ -153,4 +153,4 @@ class Workload(ABC):
     def generate_op_set(self):
         zipf_set = numpy.random.zipf(2, self.operations)
         normalized = (zipf_set / float(max(zipf_set))) * 999
-        self.op_set = [int(e) for e in normalized]
+        self.req_set = [int(e) for e in normalized]
