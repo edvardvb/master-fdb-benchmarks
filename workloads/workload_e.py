@@ -38,8 +38,8 @@ class Workload_E(Workload):
                 self.run_scan_length += scan_length
                 list(
                     self.collection.find(
-                        {"item": {"$in": list(range(start_id, start_id + scan_length))}}
-                    )
+                        {"item": {"$gte": start_id}}
+                    ).limit(scan_length)
                 )
             elif op == INSERT:
                 self.num_insert += 1
@@ -84,14 +84,10 @@ class Workload_E(Workload):
                             list(
                                 self.collection.find(
                                     {
-                                        "item": {
-                                            "$in": list(
-                                                range(start_id, start_id + scan_length)
-                                            )
-                                        }
+                                        "item": {"$gte": start_id}
                                     },
                                     session=session,
-                                )
+                                ).limit(scan_length)
                             )
                         elif op == INSERT:
                             self.num_insert += 1
